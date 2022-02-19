@@ -1,9 +1,8 @@
 import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('.form');
-const submitRef = formRef.querySelector('[type="submit"]');
 
-submitRef.addEventListener('click', onSubmitClick);
+formRef.addEventListener('submit', onSubmitClick);
 
 function onSubmitClick(event) {
   event.preventDefault();
