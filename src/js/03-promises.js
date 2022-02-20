@@ -16,23 +16,31 @@ function onSubmitClick(event) {
     Notiflix.Notify.failure('fields must be positive');
     return;
   }
+
   startRef.disabled = true;
   const disableTimeOut = +delay + (amount - 1) * step;
+  const promiseArray = [];
 
   for (let position = 0; position < amount; position++) {
     const promisePosition = position + 1;
     const promiseDelay = +delay + position * step;
-    createPromise(promisePosition, promiseDelay)
-      .then(({ position, delay }) => {
-        Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
-      })
-      .catch(({ position, delay }) => {
-        Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
-      });
+    promiseArray.push(
+      createPromise(promisePosition, promiseDelay)
+        .then(({ position, delay }) => {
+          Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+        })
+        .catch(({ position, delay }) => {
+          Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+        }),
+    );
   }
-  setTimeout(() => {
+  // setTimeout(() => {
+  //   startRef.disabled = false;
+  // }, disableTimeOut);
+  Promise.all(promiseArray).then(() => {
     startRef.disabled = false;
-  }, disableTimeOut);
+    Notiflix.Notify.success(`All promise are fulfilled, start button enabled again`);
+  });
 }
 
 function getTaskData(formRef) {
