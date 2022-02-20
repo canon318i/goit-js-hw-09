@@ -1,6 +1,7 @@
 import Notiflix from 'notiflix';
 
 const formRef = document.querySelector('.form');
+const startRef = formRef.querySelector('[type="submit"]');
 
 formRef.addEventListener('submit', onSubmitClick);
 
@@ -11,9 +12,17 @@ function onSubmitClick(event) {
     Notiflix.Notify.failure('form must be filled');
     return;
   }
+  if (delay < 0 || step < 0 || amount < 0) {
+    Notiflix.Notify.failure('fields must be positive');
+    return;
+  }
+  startRef.disabled = true;
+  const disableTimeOut = +delay + (amount - 1) * step;
 
   for (let position = 0; position < amount; position++) {
-    createPromise(position + 1, +delay + position * step)
+    const promisePosition = position + 1;
+    const promiseDelay = +delay + position * step;
+    createPromise(promisePosition, promiseDelay)
       .then(({ position, delay }) => {
         Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
       })
@@ -21,6 +30,9 @@ function onSubmitClick(event) {
         Notiflix.Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
       });
   }
+  setTimeout(() => {
+    startRef.disabled = false;
+  }, disableTimeOut);
 }
 
 function getTaskData(formRef) {
